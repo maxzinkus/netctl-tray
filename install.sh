@@ -7,10 +7,6 @@ install -Dm755 scripts/netctl-list "/usr/share/netctl-tray/netctl-list"
 install -Dm755 scripts/netctl-switch-to "/usr/share/netctl-tray/netctl-switch-to"
 install -Dm755 scripts/netctl-auto-list "/usr/share/netctl-tray/netctl-auto-list"
 install -Dm755 scripts/netctl-auto-switch-to "/usr/share/netctl-tray/netctl-auto-switch-to"
-# hooks
-install -Dm755 scripts/netctltray "/etc/netctl/hooks/netctltray"
-install -Dm755 scripts/connect "/usr/share/netctl-tray/connect"
-install -Dm755 scripts/disconnect "/usr/share/netctl-tray/disconnect"
 # svg assets
 install -d "/usr/share/netctl-tray/assets/"
 install -Dm644 assets/* "/usr/share/netctl-tray/assets/"
