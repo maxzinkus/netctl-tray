@@ -7,9 +7,9 @@ use std::fs;
 use std::thread;
 use shells::sh;
 
-/// NoProfile - no profile is active
-/// Good/Medium/Bad/NoSignal - connection strength
-/// The bool - is there internet?
+// NoProfile - no profile is active
+// Good/Medium/Bad/NoSignal - connection strength
+// The bool - is there internet?
 pub enum Status {
    NoProfile,
    Good(bool),
@@ -18,7 +18,12 @@ pub enum Status {
    NoSignal(bool),
 }
 
-pub fn get_profiles() -> Vec<(bool, String)> {
+pub struct Profile {
+   pub name: String,
+   pub is_active: bool
+}
+
+pub fn get_profiles() -> Vec<Profile> {
 	let mut profiles = Vec::new();
    let cmd_target = if cfg!(feature = "auto") {
       "/usr/share/netctl-tray/netctl-auto-list"
@@ -29,60 +34,46 @@ pub fn get_profiles() -> Vec<(bool, String)> {
 	let raw_profiles = Command::new("pkexec")
       .arg(cmd_target)
 		.output()
-		.expect("failed to run netctl").stdout;
+		.expect("Failed to run netctl").stdout;
 	// Iterate through each line
 	for line in raw_profiles.split(|c| *c == '\n' as u8) {
 		if line.len() == 0 { continue; }
 		// If the line starts with an asterisk, then the profile is active
 		let active = line[0] == ('*' as u8);
 		let profile_name = std::str::from_utf8(&line[2..]).unwrap().to_string();
-		profiles.push((active, profile_name));
+		profiles.push(Profile { name: profile_name.to_string(), is_active: active});
 	}
 	profiles
 }
 
-pub fn get_status() -> Status {
-	// Check if any profiles are active
-   let profiles = get_profiles();
-   let mut active_profile = "None";
-   for (is_active, name) in profiles.iter() {
-      if *is_active {
-         active_profile = name;
-         break;
+pub fn get_active_profile() -> Result<String, &'static str> {
+   for profile in get_profiles().iter() {
+      if profile.is_active {
+         return Ok(profile.name.to_string());
       }
    }
-   if active_profile == "None" {
-		return Status::NoProfile;
-	}
-	
-	// Check if there's internet
+   static NOPROFILEERROR: &str = "No active profile";
+   return Err(NOPROFILEERROR);
+}
+
+pub fn get_status() -> Status {
+	// Check if any profiles are active
+   let active_profile = match get_active_profile() {
+      Ok(name) => name,
+      Err(_) => return Status::NoProfile
+   };
+   // Check if there's internet
 	let can_ping = match get_rtt() {
 		Ok(_) => true,
 		Err(_) => false,
 	};
-
 	// Finally return the status
-	let conn_strength = conn_strength(active_profile) as f32;
+	let conn_strength = conn_strength(&active_profile) as f32;
 	match (conn_strength/24f32).ceil() as u8 {
 		0u8 => Status::NoSignal(can_ping),
 		1u8 => Status::Bad(can_ping),
 		2u8 => Status::Medium(can_ping),
 		_   => Status::Good(can_ping),
-	}
-}
-
-/// Returns a path to an icon depending on the status of the wifi 
-pub fn get_status_icon() -> usize {
-	match get_status() {
-		Status::NoProfile       => 0,
-		Status::Good(true)      => 1,
-		Status::Medium(true)    => 2,
-		Status::Bad(true)       => 3,
-		Status::NoSignal(true)  => 4,
-		Status::Good(false)     => 5,
-		Status::Medium(false)   => 6,
-		Status::Bad(false)      => 7,
-		Status::NoSignal(false) => 8,
 	}
 }
 
@@ -98,7 +89,7 @@ pub fn set_profile(profile: String) {
             .arg(cmd_target)
 				.arg(profile)
 				.output()
-				.expect("failed to run netctl");
+				.expect("Failed to run netctl");
 	});
 }
 
@@ -149,7 +140,7 @@ pub fn conn_strength(profile: &str) -> u8 {
 	// Check the strength of the connection
 	let conn_strength = Command::new("iwconfig")
 			.output()
-			.expect("failed to run iwconfig").stdout;
+			.expect("Failed to run iwconfig").stdout;
 	let conn_strength: u8 = match
 		RegexBuilder::new(&((&used_interface[1]).to_string() + r"(.|\n)+?Link Quality=([0-9]+)/70"))
 		.case_insensitive(true)
