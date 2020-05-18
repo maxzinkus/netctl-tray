@@ -7,7 +7,6 @@ To launch the tray app:
 ```
 $ netctl-tray
 ```
-Note: *launching the app as root is not safe*.
 
 ## Installation
 
@@ -19,8 +18,6 @@ $ sudo ./install
 ```
 
 ## Troubleshooting
-
-If you have a `netctl` profile named `None` you may run into issues.
 
 If connection strength can't be determined (`failed to read /etc/netctl/...` or
 similar), ensure that the profile files in `/etc/netctl/` are readable by the
