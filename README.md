@@ -7,6 +7,10 @@ To launch the tray app:
 ```
 $ netctl-tray
 ```
+Optionally specify an update timer in milliseconds (default 2000ms):
+```
+$ netctl-tray 5000
+```
 
 ## Installation
 
@@ -14,7 +18,7 @@ Note: if you use `netctl-auto`, add `--features auto` to the cargo build command
 
 ```
 $ cargo build --release # --features auto if netctl-auto is used
-$ sudo ./install
+$ sudo ./install.sh
 ```
 
 ## Troubleshooting

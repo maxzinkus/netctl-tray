@@ -35,11 +35,20 @@ fn main() {
       println!("Warning: tray started as root! Aborting.");
       std::process::exit(1);
    }
+   // get time interval from cli args
+   let args: Vec<String> = std::env::args().collect();
+   let interval_ms: i32;
+   if args.len() < 2 {
+      interval_ms = 2000;
+   } else {
+      interval_ms = args[1].trim().parse()
+         .expect("Invalid time interval argument.");
+   }
    // Start another thread for communicating with netctl
    QApplication::init(|_app| {
       unsafe {
          let icons = [
-            // TODO load from prefix set at runtime
+            // TODO load from prefix set at compile-time
             utils::load_icon("/usr/share/netctl-tray/assets/no_profile.svg"),
             utils::load_icon("/usr/share/netctl-tray/assets/good.svg"),
             utils::load_icon("/usr/share/netctl-tray/assets/medium.svg"),
@@ -118,7 +127,7 @@ fn main() {
          });
          menu.add_action_q_icon_q_string(
             QIcon::from_q_string(
-               // TODO load from runtime install prefix
+               // TODO load from install prefix
                QString::from_std_str("/usr/share/netctl-tray/assets/exit.svg").as_mut_ref()
             ).as_mut_ref(),
             QString::from_std_str("Exit").as_mut_ref()
@@ -133,9 +142,7 @@ fn main() {
             );
          });
          let mut update_timer = QTimer::new_0a();
-         // Call it every N seconds
-         // TODO make it a command-line option
-         update_timer.set_interval(5000);
+         update_timer.set_interval(interval_ms);
          update_timer.timeout().connect(&update_tray);
          update_timer.start_0a();
          QApplication::exec()
