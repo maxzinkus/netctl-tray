@@ -39,6 +39,9 @@ fn main() {
    let args: Vec<String> = std::env::args().collect();
    let interval_ms: i32;
    if args.len() < 2 {
+      if cfg!(debug_assertions) {
+         println!("No interval specified, using default.");
+      }
       interval_ms = 2000;
    } else {
       interval_ms = args[1].trim().parse()
@@ -133,9 +136,15 @@ fn main() {
             QString::from_std_str("Exit").as_mut_ref()
          ).triggered().connect(&exit_app);
 
+         if cfg!(debug_assertions) {
+            println!("Showing tray...");
+         }
          tray.show();
          // Make a function which will update the tray stuff when needed
          let update_tray = Slot::new(move || {
+            if cfg!(debug_assertions) {
+               println!("interval tick");
+            }
             // Update the tray icon based on the status of the connection
             tray.set_icon(
                icons[get_status_icon()].as_ref()

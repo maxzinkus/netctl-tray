@@ -30,6 +30,9 @@ pub fn get_profiles() -> Vec<Profile> {
    } else {
       "/usr/share/netctl-tray/netctl-list"
    };
+   if cfg!(debug_assertions) {
+      println!("Using {} for list", cmd_target);
+   }
 	// Get the list of all profiles
 	let raw_profiles = Command::new("pkexec")
       .arg(cmd_target)
@@ -62,11 +65,17 @@ pub fn get_status() -> Status {
       Ok(name) => name,
       Err(_) => return Status::NoProfile
    };
+   if cfg!(debug_assertions) {
+      println!("Got active profile {}", active_profile);
+   }
    // Check if there's internet
 	let can_ping = match get_rtt() {
 		Ok(_) => true,
 		Err(_) => false,
 	};
+   if cfg!(debug_assertions) {
+      println!("Ping {}", if can_ping { "success" } else { "failure" });
+   }
 	// Finally return the status
 	let conn_strength = conn_strength(&active_profile) as f32;
 	match (conn_strength/24f32).ceil() as u8 {
@@ -83,6 +92,9 @@ pub fn set_profile(profile: String) {
    } else {
       "/usr/share/netctl-tray/netctl-switch-to"
    };
+   if cfg!(debug_assertions) {
+      println!("Using {} for switch-to", cmd_target);
+   }
 	thread::spawn( move || {
 		// Switch to the new profile
 		Command::new("pkexec")
