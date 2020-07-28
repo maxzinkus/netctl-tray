@@ -15,4 +15,5 @@ name = "netctl-tray"
 path = "src/main.rs"
 
 [features]
+default = ["auto"]
 auto = []
