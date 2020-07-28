@@ -30,3 +30,5 @@ tray process. The easiest way to do this is to
 `netctl-tray` is in, and then `sudo chmod g+r <profile>`.
 
 `iwconfig` must also be installed.
+
+On GNOME >= 3.26 you may need to install/enable the App Indicators extension.
