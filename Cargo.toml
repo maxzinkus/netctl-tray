@@ -1,6 +1,6 @@
 [package]
 name = "netctl-tray"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Ponas <mykolas.peteraitis@gmail.com>", "Max Zinkus <zinkus@cs.jhu.edu>"]
 edition = "2018"
 
