@@ -14,14 +14,10 @@ enum ActivationReason {
 fn get_status_icon() -> usize {
    match utils::get_status() {
       utils::Status::NoProfile       => 0,
-      utils::Status::Good(true)      => 1,
-      utils::Status::Medium(true)    => 2,
-      utils::Status::Bad(true)       => 3,
-      utils::Status::NoSignal(true)  => 4,
-      utils::Status::Good(false)     => 5,
-      utils::Status::Medium(false)   => 6,
-      utils::Status::Bad(false)      => 7,
-      utils::Status::NoSignal(false) => 8,
+      utils::Status::Good      => 1,
+      utils::Status::Medium    => 2,
+      utils::Status::Bad       => 3,
+      utils::Status::NoSignal  => 4,
    }
 }
 
@@ -57,10 +53,6 @@ fn main() {
             utils::load_icon("/usr/share/netctl-tray/assets/medium.svg"),
             utils::load_icon("/usr/share/netctl-tray/assets/bad.svg"),
             utils::load_icon("/usr/share/netctl-tray/assets/no_signal.svg"),
-            utils::load_icon("/usr/share/netctl-tray/assets/good_no_internet.svg"),
-            utils::load_icon("/usr/share/netctl-tray/assets/medium_no_internet.svg"),
-            utils::load_icon("/usr/share/netctl-tray/assets/bad_no_internet.svg"),
-            utils::load_icon("/usr/share/netctl-tray/assets/no_signal_no_internet.svg"),
          ];
          // initiliaze tray
          let mut tray = QSystemTrayIcon::from_q_icon(

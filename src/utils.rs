@@ -12,10 +12,10 @@ use shells::sh;
 // The bool - is there internet?
 pub enum Status {
    NoProfile,
-   Good(bool),
-   Medium(bool),
-   Bad(bool),
-   NoSignal(bool),
+   Good,
+   Medium,
+   Bad,
+   NoSignal,
 }
 
 pub struct Profile {
@@ -68,21 +68,13 @@ pub fn get_status() -> Status {
    if cfg!(debug_assertions) {
       println!("Got active profile {}", active_profile);
    }
-   // Check if there's internet
-	let can_ping = match get_rtt() {
-		Ok(_) => true,
-		Err(_) => false,
-	};
-   if cfg!(debug_assertions) {
-      println!("Ping {}", if can_ping { "success" } else { "failure" });
-   }
 	// Finally return the status
 	let conn_strength = conn_strength(&active_profile) as f32;
 	match (conn_strength/24f32).ceil() as u8 {
-		0u8 => Status::NoSignal(can_ping),
-		1u8 => Status::Bad(can_ping),
-		2u8 => Status::Medium(can_ping),
-		_   => Status::Good(can_ping),
+		0u8 => Status::NoSignal,
+		1u8 => Status::Bad,
+		2u8 => Status::Medium,
+		_   => Status::Good,
 	}
 }
 
